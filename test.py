@@ -1,4 +1,4 @@
-
+#%%
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -58,6 +58,26 @@ class BPM():
         self.browser.implicitly_wait(30)
         WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "BRONZE"))).click()
     
+    def click_my_packs_tab(self):
+        body = self.browser.find_element_by_tag_name('body')
+        self.browser.implicitly_wait(30)
+        WebDriverWait(self.browser, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "MY PACKS"))).click()
+            
+    def open_my_pack(self):
+        packs = bpm.browser.find_element_by_tag_name('body'
+            ).find_elements_by_xpath("//*[contains(text(), 'Open')]")
+        packs[0].click()
+    
+    def sort_my_pack(self):
+        lists = self.browser.find_element_by_tag_name('body'
+             ).find_elements_by_class_name('sectioned-item-list')
+        self.store_all_in_club()
+        if len(lists) == 2:
+            time.sleep(1.5)
+            self.quick_sell_all()
+        else:
+            return
+        
     def purchase_bronze_pack(self):
         body = self.browser.find_element_by_tag_name('body')
         self.browser.implicitly_wait(30)
@@ -134,28 +154,29 @@ class BPM():
     def process_pack_or_coin(self, item):
         if item.text.find('Coin') != -1:
             self.browser.find_element_by_tag_name('body'
-                ).find_elements_by_xpath("//*[contains(text(), 'Redeem Coins')]")[0].click()
-        if item.text.find('Pack') > -1 :
+                ).find_element_by_xpath("//*[contains(text(), 'Redeem Coins')]").click()
+        if item.text.find('Pack') != -1 :
             self.browser.find_element_by_tag_name('body'
-                ).find_elements_by_xpath("//*[contains(text(), 'Redeem Coins')]")[0].click()
+                ).find_element_by_xpath("//*[contains(text(), 'Redeem Pack')]").click()
 
-        
-    def redeem_coins(self):
-        self.brow
             
     def quick_sell_item(self):
         self.browser.find_element_by_tag_name('body'
             ).find_elements_by_xpath("//*[contains(text(), 'Quick Sell')]")[1].click()
         time.sleep(.75)
-        buttons = bpm.browser.find_element_by_tag_name('body'
+        self.browser.find_element_by_tag_name('body'
+            ).find_element_by_class_name('dialog-body'
+            ).find_element_by_tag_name('button').click()
+    
+    def quick_sell_all(self):
+        self.browser.find_element_by_tag_name('body'
+            ).find_elements_by_xpath("//*[contains(text(), 'Quick Sell')]")[0].click()
+        time.sleep(.75)
+        self.browser.find_element_by_tag_name('body'
             ).find_element_by_class_name('dialog-body'
             ).find_element_by_tag_name('button').click()
     
     def change_info(self):
-        # buttons = bpm.browser.find_element_by_tag_name('body'
-        #     ).find_element_by_class_name('ut-navigation-bar-view'
-        #     ).find_elements_by_tag_name('button')
-        # buttons[1].click()
         self.browser.find_element_by_tag_name('body'
             ).find_element_by_class_name(self.info_change_button).click()
     
@@ -172,11 +193,27 @@ class BPM():
         time.sleep(3)
         self.sort_pack()
     
+    def open_my_pack_loop(self):
+        self.click_store()
+        time.sleep(1)
+        self.open_my_pack()
+        time.sleep(3)
+        self.sort_my_pack()
+
+    def pack_opener(self):
+        self.click_store()
+        packs_remaining = len(self.browser.find_element_by_tag_name('body'
+            ).find_elements_by_xpath("//*[contains(text(), 'Open')]"))
+        for i in range(packs_remaining):
+            print('Packs Remaining: ' + str(packs_remaining - i) + '/' + str(packs_remaining))
+            time.sleep(1)
+            self.open_my_pack_loop()
+
     def run(self):
         self.change_info()
         num_packs_opened = 0
         while self.num_transfer_slots_filled < 98:
-            print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/ 100")
+            print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/100")
             time.sleep(1)
             self.pack_loop()
             num_packs_opened += 1
@@ -185,18 +222,21 @@ class BPM():
     def run_n(self, n):
         num_packs_opened = 0
         while num_packs_opened < n and self.num_transfer_slots_filled < 98:
-            print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/ 100")
+            print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/100")
             time.sleep(1)
             self.pack_loop()
             num_packs_opened += 1
             print('Number of Packs Remaining: ', str(n-num_packs_opened))
     
-
+#%%
 slots = int(input('Please enter the number of filled transfer slots: '))
 
 bpm = BPM(slots, chrome_profile='C:\\Users\\aluru\\AppData\\Local\\Google\\Chrome\\User Data')
 # bpm.login()
 time.sleep(30)
 bpm.change_info()
-bpm.run_n(50)
+time.sleep(1)
+bpm.pack_opener()
+
+#bpm.run_n(50)
 # %%
