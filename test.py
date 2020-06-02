@@ -1,4 +1,4 @@
-#%%
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -63,7 +63,7 @@ class BPM():
         self.browser.implicitly_wait(30)
         buttons = body.find_element_by_class_name('ut-store-hub-view--content').find_elements_by_tag_name('button')
         buttons[2].click()
-        time.sleep(1)
+        time.sleep(1.5)
         body = self.browser.find_element_by_class_name('dialog-body'
             ).find_elements_by_tag_name('button')[0].click()
 
@@ -73,6 +73,7 @@ class BPM():
         if len(self.browser.find_element_by_tag_name('body'
              ).find_elements_by_class_name('sectioned-item-list')) == 0:
             return
+        time.sleep(.25)
         self.process_coins()
         if len(self.browser.find_element_by_tag_name('body'
              ).find_elements_by_class_name('sectioned-item-list')) == 0:
@@ -145,7 +146,7 @@ class BPM():
     def quick_sell_item(self):
         self.browser.find_element_by_tag_name('body'
             ).find_elements_by_xpath("//*[contains(text(), 'Quick Sell')]")[1].click()
-        time.sleep(1.5)
+        time.sleep(.75)
         buttons = bpm.browser.find_element_by_tag_name('body'
             ).find_element_by_class_name('dialog-body'
             ).find_element_by_tag_name('button').click()
@@ -173,15 +174,29 @@ class BPM():
     
     def run(self):
         self.change_info()
+        num_packs_opened = 0
         while self.num_transfer_slots_filled < 98:
+            print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/ 100")
             time.sleep(1)
             self.pack_loop()
-
+            num_packs_opened += 1
+            print('Number of Packs Opened: ' + str(num_packs_opened))
+    
+    def run_n(self, n):
+        num_packs_opened = 0
+        while num_packs_opened < n and self.num_transfer_slots_filled < 98:
+            print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/ 100")
+            time.sleep(1)
+            self.pack_loop()
+            num_packs_opened += 1
+            print('Number of Packs Remaining: ', str(n-num_packs_opened))
     
 
-# %%
-bpm = BPM(26, chrome_profile='C:\\Users\\aluru\\AppData\\Local\\Google\\Chrome\\User Data')
+slots = int(input('Please enter the number of filled transfer slots: '))
+
+bpm = BPM(slots, chrome_profile='C:\\Users\\aluru\\AppData\\Local\\Google\\Chrome\\User Data')
 # bpm.login()
 time.sleep(30)
-bpm.run()
+bpm.change_info()
+bpm.run_n(50)
 # %%
