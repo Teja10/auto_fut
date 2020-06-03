@@ -186,7 +186,7 @@ class BPM():
     
     def pack_loop(self):
         self.click_store()
-        time.sleep(1)
+        time.sleep(2)
         self.click_bronze_tab()
         time.sleep(1)
         self.purchase_bronze_pack()
