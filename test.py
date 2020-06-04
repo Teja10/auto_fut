@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 
 good_leagues = {"CHN 1", "MEX 1", "GER 1", "FRA 1", "ESP 1", "ENG 1", "ENG 2" "ITA 1",
-                "MLS", "BEL 1", "SAU 1", "NED", "POR 1", "LIB", "SUD"}
+                "MLS", "BEL 1", "SAU 1", "NED 1", "POR 1", "LIB", "SUD", "TUR 1"}
 class BPM():
     def __init__(self, num_transfer_slots_filled, chrome_profile=None):
         super().__init__()
@@ -220,6 +220,7 @@ class BPM():
             print('Number of Packs Opened: ' + str(num_packs_opened))
     
     def run_n(self, n):
+        self.change_info()
         num_packs_opened = 0
         while num_packs_opened < n and self.num_transfer_slots_filled < 98:
             print("Transfer Slots Remaining: " + str(self.num_transfer_slots_filled) + "/100")
@@ -233,10 +234,9 @@ slots = int(input('Please enter the number of filled transfer slots: '))
 
 bpm = BPM(slots, chrome_profile='C:\\Users\\aluru\\AppData\\Local\\Google\\Chrome\\User Data')
 # bpm.login()
-time.sleep(30)
-bpm.change_info()
+time.sleep(40)
 time.sleep(1)
-bpm.pack_opener()
+bpm.run()
 
 #bpm.run_n(50)
 # %%
